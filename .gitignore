@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+*.sqlite*
+democratie_experiments/settings_dist.py
