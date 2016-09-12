@@ -90,3 +90,6 @@ ENV/
 
 *.sqlite*
 democratie_experiments/settings_dist.py
+
+
+migrations

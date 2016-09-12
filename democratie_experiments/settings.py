@@ -22,7 +22,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -34,7 +35,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'encryption'
+    'encryption',
+    'candidates',
+    'polls',
+    'citizen'
 ]
 
 MIDDLEWARE = [
@@ -71,13 +75,32 @@ WSGI_APPLICATION = 'democratie_experiments.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+from settings_dist import *
 
+
+DATABASES = {
+
+        'default': {
+            'ENGINE':   'django.db.backends.postgresql_psycopg2',
+            'NAME':     PSQL_TEST_DB,
+            'USER':     PSQL_TEST_USER,
+            'PASSWORD': PSQL_TEST_PWD,
+            'HOST':     PSQL_TEST_HOST,
+            'PORT':     ''
+
+        }
+        # Production database
+        # 'default': {
+        #     'ENGINE':   'django.db.backends.postgresql_psycopg2',
+        #     'NAME':     PSQL_DEFAULT_DB,
+        #     'USER':     PSQL_DEFAULT_PWD,
+        #     'PASSWORD': PSQL_DEFAULT_USER,
+        #     'HOST':     PSQL_DEFAULT_HOST,
+        #     'PORT':     ''
+        # }
+
+
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -117,4 +140,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-from settings_dist import *
+
+from django.conf import settings
+print settings.AUTHENTICATION_BACKENDS
