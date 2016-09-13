@@ -6,7 +6,7 @@ from models import *
 class VoteForm(ModelForm):
     class Meta:
         model = Vote
-        fields = ["value", "poll"]
+        fields = ["poll"]
 
 
     def clean(self):
