@@ -1,18 +1,13 @@
-from django.forms import ModelForm
+from django import forms
 
-from models import *
-
-
-class VoteForm(ModelForm):
-    class Meta:
-        model = Vote
-        fields = ["poll"]
+from candidates.models import Candidate
 
 
-    def clean(self):
-        super(VoteForm, self).clean()
+class PollForm(forms.Form):
+    value = forms.IntegerField()
 
-        
+class MajorityPollForm(forms.Form):
+    candidates = forms.ModelChoiceField(queryset=Candidate.objects.all())
 
-
-
+class ApprovalPollForm(forms.Form):
+    candidates = forms.ModelMultipleChoiceField(queryset=Candidate.objects.all())

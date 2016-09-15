@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
 
 from forms import *
+from models import POLLS_LIST
 # Create your views here.
 
 from encryption.payload import *
@@ -89,9 +90,9 @@ def vote(request):
     if request.POST is None:
         return HttpResponseBadRequest('') # find a fancy error explanation
 
-    vform = VoteForm(request.POST)
+    form_vote = PollForm(request.POST)
     try:
-        vform.save()
+        form_vote.save()
     except ValidationError:
         return HttpResponseBadRequest("Erreur de validation")
 
@@ -99,9 +100,30 @@ def vote(request):
     return HttpResponse("A voté")
 
 
+def display_vote(request, poll_id):
+    poll_id = int(poll_id)
+    if poll_id >= len(POLLS_LIST):
+        return HttpResponseBadRequest("This poll type doesn't exist.")
+
+    poll_type = POLLS_LIST[poll_id]()
+
+    if request.POST:
+        form_vote = poll_type.form_associated(request.POST)
+        try:
+            form_vote.save()
+        except ValidationError:
+            return HttpResponseBadRequest("Erreur de validation")
+    else:
+        form_vote = poll_type.form_associated()
+
+    return render(request, 'polls/vote.html', {'form_vote':form_vote})
+
+def display_polls(request):
+    return render(request, 'polls/polls_list.html', {'polls_list':POLLS_LIST})
+
 
 """
-    Probably too costly too really compute each time there is a request.
+    Probably too costly to really compute each time there is a request.
     We should implement a cache for that.
 """
 def get_results(request):
