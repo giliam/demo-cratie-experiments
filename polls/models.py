@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.forms import ValidationError
 
-from forms import MajorityPollForm, ApprovalPollForm
+from forms import PollForm, MajorityPollForm, ApprovalPollForm
 
 from citizen.models import Citizen
 from candidates.models import Candidate
@@ -34,35 +34,62 @@ class DataVote(models.Model):
         db_table = "data_vote"
 
 
-class ClassicMajorityPoll:
-    name = "Classic majority poll"
-    form_associated = MajorityPollForm
-    pkey = 1
+class AbstractPoll(object):
+    name = "Abstract poll"
+    form_associated = PollForm
+    key = 0
+    
+    def __init__(self):
+        pass
 
     def form_handle(self, form):
         if form.is_valid():
             vote = Vote()
-            vote.poll = Poll.objects.get(id=self.pkey)
-            vote.voter = 1
+            vote.poll = PollType.objects.get(id=self.key)
+            vote.voter = Citizen.objects.get(id=1)
+            vote.save()
+            return vote
+        else:
+            raise ValidationError("Form is not valid")
+            return None
 
+class ClassicMajorityPoll(AbstractPoll):
+    name = "Classic majority poll"
+    form_associated = MajorityPollForm
+    key = 1
+
+    def __init__(self):
+        AbstractPoll.__init__(self)
+
+    def form_handle(self, form):
+        vote = super(ClassicMajorityPoll, self).form_handle(form)
+        if vote:
             dataVote = DataVote()
             dataVote.vote = vote
             dataVote.value = 1
             dataVote.candidate= form.cleaned_data["candidates"]
-
-            vote.save()
             dataVote.save()
         else:
             raise ValidationError("Form is not valid")
 
-class ApprovalPoll:
+class ApprovalPoll(AbstractPoll):
     name = "Approval poll"
     form_associated = ApprovalPollForm
-    pkey = 2
+    key = 2
+
+    def __init__(self):
+        AbstractPoll.__init__(self)
 
     def form_handle(self, form):
-        if form.is_valid():
-            print form.cleaned_data["candidates"]
+        vote = super(ApprovalPoll, self).form_handle(form)
+        if vote:
+            for candidate in form.cleaned_data["candidates"]:
+                print candidate
+                dataVote = DataVote()
+                dataVote.vote = vote
+                dataVote.value = 1
+                dataVote.candidate = candidate
+                dataVote.save()
         else:
             raise ValidationError("Form is not valid")
 
@@ -71,6 +98,6 @@ POLLS_LIST=[ClassicMajorityPoll, ApprovalPoll]
 
 def check_polls_lists():
     for key, poll in enumerate(POLLS_LIST):
-        if key != poll().pkey-1:
+        if key != poll().key-1:
             raise Exception("Couldn't validate polls list")
 check_polls_lists()

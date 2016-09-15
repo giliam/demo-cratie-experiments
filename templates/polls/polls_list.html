@@ -1,7 +1,7 @@
 <ul>
 {% for poll in polls_list %}
 <li>
-<a href="{% url "display_vote" forloop.counter0 %}">{{ poll._meta.db_table }}</a>
+<a href="{% url "display_vote" poll.key %}">{{ poll.name }}</a>
 </li>
 {% endfor %}
 </ul>

@@ -16,7 +16,7 @@ class Citizen(AbstractBaseUser):
     REQUIRED_FIELDS = ['pkey']
 
     def __unicode__(self):
-        return username.encode("utf8")
+        return self.username.encode("utf8")
 
     class Meta:
         db_table = "citizen"

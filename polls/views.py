@@ -102,9 +102,10 @@ def vote(request):
 
 def display_vote(request, poll_id):
     poll_id = int(poll_id)
+    print poll_id
     if poll_id > len(POLLS_LIST) or poll_id == 0:
         return HttpResponseBadRequest("This poll type doesn't exist.")
-
+    poll_id = poll_id - 1
     poll_type = POLLS_LIST[poll_id]()
 
     if request.POST:
