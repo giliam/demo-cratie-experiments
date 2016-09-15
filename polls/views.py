@@ -102,7 +102,7 @@ def vote(request):
 
 def display_vote(request, poll_id):
     poll_id = int(poll_id)
-    if poll_id >= len(POLLS_LIST):
+    if poll_id > len(POLLS_LIST) or poll_id == 0:
         return HttpResponseBadRequest("This poll type doesn't exist.")
 
     poll_type = POLLS_LIST[poll_id]()
@@ -110,7 +110,7 @@ def display_vote(request, poll_id):
     if request.POST:
         form_vote = poll_type.form_associated(request.POST)
         try:
-            form_vote.save()
+            poll_type.form_handle(form_vote)
         except ValidationError:
             return HttpResponseBadRequest("Erreur de validation")
     else:

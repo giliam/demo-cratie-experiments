@@ -19,7 +19,8 @@ class Party(models.Model):
 
     class Meta:
         db_table = "party"
-        verbose_name="name"
+        verbose_name="party"
+        verbose_name_plural="parties"
 
 
 class Candidate(models.Model):
@@ -33,6 +34,4 @@ class Candidate(models.Model):
 
     class Meta:
         db_table = "candidate"
-        verbose_name="name"
-
-
+        verbose_name = "candidate"
