@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseBadRequest
 from django.forms import ValidationError
+from django.contrib.auth.decorators import login_required
 
 from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
@@ -9,6 +10,7 @@ from functools import wraps
 from forms import *
 # Create your views here.
 
+from encryption.decorators import *
 from encryption.payload import *
 
 
@@ -81,10 +83,12 @@ def request_passes_test(test_func, *args, **kwargs):
 @citizen_validation
 @request_passes_test(check_length, 10)
 @request_passes_test(check_payload)
-def test_length(request, **kwargs):
+def test_length(request):
     return HttpResponse(request.body)
 
 
+@login_required
+@solve_challenge(settings.HASHCASH_CHALLENGE)
 def vote(request):
     if request.POST is None:
         return HttpResponseBadRequest('') # find a fancy error explanation

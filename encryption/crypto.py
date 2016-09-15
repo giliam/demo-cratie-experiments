@@ -2,6 +2,8 @@ from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto import Random
+from string import ascii_letters
+from random import choice
 
 
 AES_BLOCK_SIZE = 16
@@ -93,3 +95,12 @@ def generateRSAKeys():
     key = RSA.generate(RSA_KEY_SIZE, random_generator)
     return key
 
+
+
+# def random_int(max):
+#     from random import SystemRandom
+    
+def random_string(l):
+    "Return a random string of length 'l'"
+    alphabet = ascii_letters + "+/="
+    return ''.join([choice(alphabet) for _ in [None]*l])

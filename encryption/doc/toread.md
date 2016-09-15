@@ -7,3 +7,6 @@ http://www.ibm.com/developerworks/websphere/techjournal/1210_lansche/1210_lansch
 http://stackoverflow.com/questions/15682310/how-to-secure-communication-in-client-server-app
 
 http://programmers.stackexchange.com/questions/145704/safe-iphone-app-%E2%86%94-server-communication
+
+
+http://eprint.iacr.org/2010/649.pdf

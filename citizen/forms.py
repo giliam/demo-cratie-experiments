@@ -13,4 +13,5 @@ class CitizenForm(ModelForm):
         pkey = self.cleaned_data["pkey"]
         if rsa_check(rsa_recompose(pkey)):
             return rsa_clean(pkey)
-        raise ValidationError("Incorrect format for Pulbic Key")
+        print "rsa check failed"
+        raise ValidationError("Incorrect format for Public Key")

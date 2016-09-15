@@ -1,5 +1,7 @@
 from crypto import *
 from json import loads
+
+from django.conf import settings
 # https://pypi.python.org/pypi/pycrypto
 
 # References:
@@ -30,13 +32,13 @@ from json import loads
 
 class Payload(object):
 
-    def __init__(self, raw_content, public_key):
+    def __init__(self, raw_content):
         """
         :str raw_content: the raw content of the http request body
-        :_RSAobj public_key: the public of the user associated with the request
+        :Server server: the authority server instance for the current session
+            used to retrieve the RSA key
         """
         self.blob = raw_content
-        self.pkey = public_key
 
 
     def check_validity(self):
@@ -50,8 +52,8 @@ class Payload(object):
         except ValueError, KeyError:
             return False
 
-        dec_sig = rsa_decrypt(enc_sig, self.public_key)
-        if len(dec_sig) != SHA_SIZE + AES_PWD_SIZE:
+        dec_sig = rsa_decrypt(enc_sig, settings.SERVER_KEY)
+        if len(dec_sig) != settings.SHA_SIZE + settings.AES_PWD_SIZE:
             return False
         
         pwd = dec_sig[0:32]
