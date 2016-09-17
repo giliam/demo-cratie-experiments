@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
 
 from forms import *
-from models import POLLS_LIST
+from models import Poll, POLLS_LIST
 # Create your views here.
 
 from encryption.payload import *
@@ -128,6 +128,13 @@ def display_polls(request):
     We should implement a cache for that.
 """
 def get_results(request):
-    pass
-
-
+    polls = Poll.objects.all()
+    results = []
+    dic = {}
+    for poll in polls:
+        for poll_type in poll.poll_types.all():
+            dic["poll"] = poll
+            dic["candidates"] = POLLS_LIST[poll_type.key - 1]().compute_results(poll)
+            results.append(dic)
+    print results
+    return render(request, 'polls/results.html', {'results':results})
