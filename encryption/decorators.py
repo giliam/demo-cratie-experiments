@@ -23,7 +23,7 @@ def send_challenge(challenge_type, request, *args, **kwargs):
 
 
     return HttpResponse(json.dumps({"challenge": new_entry.pk,
-        "challenge_params": new_entry.params}))
+        "challenge_params": new_entry.parameters}))
 
 
 
@@ -55,9 +55,15 @@ def solve_challenge(challenge_type, *args, **kwargs):
                     **kwargs)
 
             entry.answer = challenge_answer
+            entry.save()
             if ChallengeFactory.new(challenge_type).validate(entry):
+                print "challenged passed"
+                entry.answer_correct = True
+                entry.save()
                 return view_func(request)
             else:
+                entry.answer_correct = False
+                entry.save()
                 return send_challenge(challenge_type, request, *args, 
                     **kwargs)
         return _wrapped

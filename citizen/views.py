@@ -23,7 +23,7 @@ def create(request):
         print "trying to login"
         login(request, citizen)
         print "trying to send response"
-        return HttpResponse("Bienvenu")
+        return HttpResponse("Bienvenue")
     else:
         return HttpResponseBadRequest(citizen_form.errors)
 

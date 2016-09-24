@@ -14,8 +14,15 @@ class Party(models.Model):
     # (date of creation, number of adherent, number of counties, regions, numbers
     # of chairs in the assemble, previous election results etc...
 
+    def __repr__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         db_table = "party"
+        verbose_name_plural = "Parties"
 
 
 class Candidate(models.Model):
@@ -23,6 +30,12 @@ class Candidate(models.Model):
             blank=False, max_length=255)
 
     party = models.ForeignKey(Party, null=False)
+    
+    def __repr__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         db_table = "candidate"

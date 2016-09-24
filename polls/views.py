@@ -86,13 +86,15 @@ def request_passes_test(test_func, *args, **kwargs):
 def test_length(request):
     return HttpResponse(request.body)
 
-
+@csrf_exempt
 @login_required
 @solve_challenge(settings.HASHCASH_CHALLENGE)
 def vote(request):
     if request.POST is None:
         return HttpResponseBadRequest('') # find a fancy error explanation
 
+    print request.POST
+    return HttpResponse(u"A voté", content_type='text/plain; charset=utf-8')
     vform = VoteForm(request.POST)
     try:
         vform.save()
@@ -100,7 +102,7 @@ def vote(request):
         return HttpResponseBadRequest("Erreur de validation")
 
 
-    return HttpResponse("A voté")
+    return HttpResponse(u"A voté", content_type='text/plain; charset=utf-8')
 
 
 

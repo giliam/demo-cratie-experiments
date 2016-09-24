@@ -141,12 +141,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-from django.conf import settings
-print settings.AUTHENTICATION_BACKENDS
-
-
 from Crypto.PublicKey import RSA
 with open(KEY_PATH, "r") as f:
     SERVER_KEY = RSA.importKey(f.read())
 
-# AUTH_USER_MODEL = "citizen.Citizen"
+AUTH_USER_MODEL = "citizen.Citizen"
+
+DEFAULT_CHARSET = 'utf-8'

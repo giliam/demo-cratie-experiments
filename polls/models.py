@@ -6,15 +6,30 @@ from citizen.models import Citizen
 from candidates.models import Candidate
 # Create your models here.
 
+from .polls import *
+from candidates.models import Candidate
 
 class Poll(models.Model):
     name = models.CharField(max_length=255, unique=True, 
-        null=False, default=False)
+        null=False, default="")
     description = models.CharField(max_length=10000, null=False, blank=True, 
         default="")
 
     class Meta:
         db_table = "poll"
+
+
+    def winner(self):
+        if not self.name in globals():
+            print "No known class for this poll: {0}".format(self.name)
+            return
+        ThisPoll = globals()[self.name]
+        tp = ThisPoll(Candidate.objects.all())
+        data_votes = self.vote_set.datavote_set
+        tp.account_votes(data_votes)
+        return tp.winner()
+
+
 
 
 class Vote(models.Model):
