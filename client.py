@@ -19,6 +19,7 @@ pkey = "".join(pkey.split("\n")[1:-1])
 print "creating user {0} {1}".format(password, pkey)
 r = req.post(SERVER + "citizen/create/", data={"password":password, 
     "pkey":pkey})
+print r.cookies
 
 if r.status_code != 200:
     with open("error.html", "w") as f:

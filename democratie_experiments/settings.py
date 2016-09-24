@@ -41,14 +41,14 @@ INSTALLED_APPS = [
     'citizen'
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+MIDDLEWARE_CLASSES = [
+'django.contrib.sessions.middleware.SessionMiddleware',
+'django.middleware.common.CommonMiddleware',
+'django.middleware.csrf.CsrfViewMiddleware',
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
+'django.middleware.clickjacking.XFrameOptionsMiddleware',
+'django.middleware.security.SecurityMiddleware',
 ]
 
 ROOT_URLCONF = 'democratie_experiments.urls'
@@ -149,4 +149,4 @@ from Crypto.PublicKey import RSA
 with open(KEY_PATH, "r") as f:
     SERVER_KEY = RSA.importKey(f.read())
 
-AUTH_USER_MODEL = "citizen.Citizen"
+# AUTH_USER_MODEL = "citizen.Citizen"
