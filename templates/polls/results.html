@@ -1,6 +1,6 @@
 {% for result in results %}
 <p>
-Vote #{{ result.poll.poll_type.key }} {{ result.poll.poll_type.name }} : 
+Vote #{{ result.poll_type.key }} {{ result.poll_type.name }} : 
 	{% for data in result.candidates %}
 		<li>Candidate {{data.candidate__name}} : {{data.total_votes}}</li>
 	{% endfor %}

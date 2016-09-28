@@ -7,7 +7,6 @@ from forms import PollForm, MajorityPollForm, ApprovalPollForm
 
 from citizen.models import Citizen
 from candidates.models import Candidate
-# Create your models here.
 
 class PollType(models.Model):
     name = models.CharField(max_length=255, unique=True, 
@@ -35,12 +34,14 @@ class Poll(models.Model):
 
 class Vote(models.Model):
     poll = models.ForeignKey(Poll, null=False, blank=False)
+    poll_type = models.ForeignKey(PollType, null=False, blank=False)
     voter = models.ForeignKey(Citizen, null=False, blank=False, default="")
     class Meta:
         db_table = "vote"
 
 class DataVote(models.Model):
     poll = models.ForeignKey(Poll, null=False, blank=False)
+    poll_type = models.ForeignKey(PollType, null=False, blank=False)
     value = models.PositiveIntegerField(null=False, default=0)
     candidate = models.ForeignKey(Candidate, null=False, blank=False)
 
@@ -56,19 +57,16 @@ class AbstractPoll(object):
     def __init__(self):
         pass
 
-    def has_voted(self, poll_id):
-        dataVotes = Vote.objects.filter(voter__id=1, poll__id=poll_id)
-        print len(dataVotes.all())
-
-    def form_handle(self, form):
-        self.has_voted(1)
+    def form_handle(self, form, voter_id, poll_id):
         if form.is_valid():
             vote = Vote()
-            vote.poll = Poll.objects.get(id=self.key)
-            vote.voter = Citizen.objects.get(id=1)
+            vote.poll = Poll.objects.get(id=poll_id)
+            vote.poll_type = PollType.objects.get(key=self.key)
+            vote.voter = Citizen.objects.get(id=voter_id)
             vote.save()
             return True
         else:
+            print "Form is not valid"
             raise ValidationError("Form is not valid")
             return False
 
@@ -83,19 +81,21 @@ class ClassicMajorityPoll(AbstractPoll):
     def __init__(self):
         AbstractPoll.__init__(self)
 
-    def form_handle(self, form):
-        vote = super(ClassicMajorityPoll, self).form_handle(form)
+    def form_handle(self, form, voter_id, poll_id):
+        vote = super(ClassicMajorityPoll, self).form_handle(form, voter_id, poll_id)
         if vote:
             dataVote = DataVote()
-            dataVote.poll = Poll.objects.get(id=self.key)
+            dataVote.poll = Poll.objects.get(id=poll_id)
+            dataVote.poll_type = PollType.objects.get(key=self.key)
             dataVote.value = 1
             dataVote.candidate= form.cleaned_data["candidates"]
             dataVote.save()
         else:
+            print "Form is not valid"
             raise ValidationError("Form is not valid")
 
     def compute_results(self, poll):
-        data_votes = DataVote.objects.filter(poll=poll).values("candidate__name").annotate(total_votes=models.Sum('value'))
+        data_votes = DataVote.objects.filter(poll=poll, poll_type__key=self.key).values("candidate__name").annotate(total_votes=models.Sum('value'))
         return data_votes
 
 class ApprovalPoll(AbstractPoll):
@@ -106,28 +106,29 @@ class ApprovalPoll(AbstractPoll):
     def __init__(self):
         AbstractPoll.__init__(self)
 
-    def form_handle(self, form):
-        vote = super(ApprovalPoll, self).form_handle(form)
+    def form_handle(self, form, voter_id, poll_id):
+        vote = super(ApprovalPoll, self).form_handle(form, voter_id, poll_id)
         if vote:
             for candidate in form.cleaned_data["candidates"]:
-                print candidate
                 dataVote = DataVote()
-                dataVote.poll = Poll.objects.get(id=self.key)
+                dataVote.poll = Poll.objects.get(id=poll_id)
+                dataVote.poll_type = PollType.objects.get(key=self.key)
                 dataVote.value = 1
                 dataVote.candidate = candidate
                 dataVote.save()
         else:
+            print "Form is not valid"
             raise ValidationError("Form is not valid")
 
     def compute_results(self, poll):
-        data_votes = DataVote.objects.filter(poll=poll).values("candidate__name").annotate(total_votes=models.Sum('value'))
-
-        return {}
+        data_votes = DataVote.objects.filter(poll=poll, poll_type__key=self.key).values("candidate__name").annotate(total_votes=models.Sum('value'))
+        return data_votes
 
 POLLS_LIST=[ClassicMajorityPoll, ApprovalPoll]
 
 def check_polls_lists():
     for key, poll in enumerate(POLLS_LIST):
         if key != poll().key-1:
+            print "Couldn't validate polls list"
             raise Exception("Couldn't validate polls list")
 check_polls_lists()
