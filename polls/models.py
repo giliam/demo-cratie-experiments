@@ -56,7 +56,12 @@ class AbstractPoll(object):
     def __init__(self):
         pass
 
+    def has_voted(self, poll_id):
+        dataVotes = Vote.objects.filter(voter__id=1, poll__id=poll_id)
+        print len(dataVotes.all())
+
     def form_handle(self, form):
+        self.has_voted(1)
         if form.is_valid():
             vote = Vote()
             vote.poll = Poll.objects.get(id=self.key)

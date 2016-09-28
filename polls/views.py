@@ -5,6 +5,7 @@ from django.forms import ValidationError
 
 from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
+from datetime import datetime
 
 from forms import *
 from models import Poll, POLLS_LIST
@@ -100,27 +101,35 @@ def vote(request):
     return HttpResponse("A voté")
 
 
-def display_vote(request, poll_id):
+def display_vote(request, poll_id, poll_type):
     poll_id = int(poll_id)
-    print poll_id
-    if poll_id > len(POLLS_LIST) or poll_id == 0:
-        return HttpResponseBadRequest("This poll type doesn't exist.")
-    poll_id = poll_id - 1
-    poll_type = POLLS_LIST[poll_id]()
+    poll_type = int(poll_type)
+    now = datetime.now()
+    
+    # TODO: check poll_type is in types available for this poll
+    try:
+        poll = Poll.objects.get(date_beginning_poll__lte=now, date_end_poll__gte=now, id=poll_id)
+    except Poll.ObjectNotFound:
+        return HttpResponseBadRequest("Couldn't find poll.")
+
+    poll_type_id = poll_type - 1
+    poll_type_object = POLLS_LIST[poll_type_id]()
 
     if request.POST:
-        form_vote = poll_type.form_associated(request.POST)
+        form_vote = poll_type_object.form_associated(request.POST)
         try:
-            poll_type.form_handle(form_vote)
+            poll_type_object.form_handle(form_vote)
         except ValidationError:
             return HttpResponseBadRequest("Erreur de validation")
     else:
-        form_vote = poll_type.form_associated()
+        form_vote = poll_type_object.form_associated()
 
     return render(request, 'polls/vote.html', {'form_vote':form_vote})
 
 def display_polls(request):
-    return render(request, 'polls/polls_list.html', {'polls_list':POLLS_LIST})
+    now = datetime.now()
+    polls = Poll.objects.filter(date_beginning_poll__lte=now, date_end_poll__gte=now)
+    return render(request, 'polls/polls_list.html', {'polls_list':polls})
 
 
 """
